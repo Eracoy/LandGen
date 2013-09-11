@@ -1,3 +1,4 @@
+
 import pygame, sys, math, os, random
 from perlinalgs import *
 from npc import *
@@ -21,19 +22,23 @@ grass=pygame.image.load(os.path.join("grass.png"))
 sand=pygame.image.load(os.path.join("sand.png"))
 stone=pygame.image.load(os.path.join("stone.png"))
 tree=pygame.image.load(os.path.join("tree.png"))
+playerImage=pygame.image.load(os.path.join("player.png"))
 tileimages=(water,grass,sand,stone,tree)
 # 0 Water
 # 1 Grass
 # 2 Sand
 # 3 Mountain
 # 4 Stone
+
+#Return a random selection from a set with weights
 def randblock(weight):
     rnd = random.random() * sum(weight)
     for i, w in enumerate(weight):
         rnd -= w
         if rnd < 0:
             return i
-        
+
+#generates a new map with random surface at each point. No smoothing, but beaches are applied
 def newworld(sizex,sizey):
     world=[[0 for a in range(sizey)] for b in range(sizex)]
     for a in range(worldy):
@@ -58,7 +63,9 @@ def perlinworld(sizex,sizey):
                 world2[a%128][b%128]=3
     return world2
 
-def makebeaches(world):#if land is touching water on a side, make it sand
+#Smooth out the transition between land and water by adding beaches
+#if land is touching water on a side, make it sand
+def makebeaches(world):
     y=len(world) #worldx size
     x=len(world[0]) #worldy size
     for a in range(1,worldy-1):
@@ -74,7 +81,6 @@ def drawworld(screen,world,tileimages):
         for b in range(worldy):
             tilesizex,tilesizey=int(tilex/zoomlevel),int(tiley/zoomlevel)
             screen.blit(tileimages[world[a][b]],(a*tilesizex,b*tilesizey))
-            #pygame.draw.circle(screen,(0,0,133),(50,50),10)
             
 def drawnpcs(screen, npclist):
     a=npclist
@@ -83,7 +89,7 @@ def drawnpcs(screen, npclist):
 def main():
     world=perlinworld(worldx,worldy)
     world=makebeaches(world)
-    player=npc(stone,92,92)
+    player=npc(playerImage,92,92)
     player.moveto(52,52)
     print(world)
     drawworld(worldimage,world,tileimages)#render world
